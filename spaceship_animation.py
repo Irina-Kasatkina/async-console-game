@@ -18,7 +18,6 @@ async def animate_spaceship(canvas, row, column, frames):
     for frame in cycle(frames):
         draw_frame(canvas, previous_row, previous_column, previous_frame, negative=True)
         draw_frame(canvas, row, column, frame)
-        canvas.border()
         previous_row, previous_column, previous_frame = row, column, frame
 
         for _ in range(2):
