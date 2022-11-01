@@ -114,7 +114,7 @@ def get_spaceship(height, width):
     row = (height - max_rows_count) // 2
     column = (width - max_columns_count) // 2
 
-    Spaceship = namedtuple('Spaceshop', 'row column frames')
+    Spaceship = namedtuple('Spaceship', 'row column frames')
     return Spaceship(row=row, column=column, frames=frames)
 
 
