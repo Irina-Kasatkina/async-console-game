@@ -24,7 +24,7 @@ def draw(canvas):
     height, width = canvas.getmaxyx()
     stars = create_stars(height, width)
     flames = create_flames(height, width)
-    spaceships_row, spaceships_column, spaceships_frames = get_spaceships(height, width)
+    spaceship = get_spaceship(height, width)    
 
     coroutines = (
         [
@@ -42,7 +42,7 @@ def draw(canvas):
             for flame in flames
         ] +
         [
-            animate_spaceship(canvas, spaceships_row, spaceships_column, spaceships_frames)
+            animate_spaceship(canvas, spaceship)
         ]
     )
 
@@ -97,7 +97,7 @@ def create_flames(height, width):
     ]
 
 
-def get_spaceships(height, width):
+def get_spaceship(height, width):
     filenames = ['frames/rocket_frame_1.txt', 'frames/rocket_frame_2.txt']
     frames = []
     max_rows_count = max_columns_count = 0
@@ -114,7 +114,8 @@ def get_spaceships(height, width):
     row = (height - max_rows_count) // 2
     column = (width - max_columns_count) // 2
 
-    return row, column, frames
+    Spaceship = namedtuple('Spaceshop', 'row column frames')
+    return Spaceship(row=row, column=column, frames=frames)
 
 
 def count_rows_and_columns(text):

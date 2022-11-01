@@ -5,17 +5,18 @@ from itertools import cycle
 from curses_tools import draw_frame, read_controls
 
 
-async def animate_spaceship(canvas, row, column, frames):
+async def animate_spaceship(canvas, spaceship):
+    row, column = spaceship.row, spaceship.column
     canvas_last_row, canvas_last_column = [size - 1 for size in canvas.getmaxyx()]
 
     spaceship_rows = spaceship_columns = 0
-    for frame in frames:
+    for frame in spaceship.frames:
         rows, columns = get_frame_size(frame)
         spaceship_rows = max(spaceship_rows, rows)
         spaceship_columns = max(spaceship_columns, columns)
 
     previous_row, previous_column, previous_frame = row, column, ''
-    for frame in cycle(frames):
+    for frame in cycle(spaceship.frames):
         draw_frame(canvas, previous_row, previous_column, previous_frame, negative=True)
         draw_frame(canvas, row, column, frame)
         previous_row, previous_column, previous_frame = row, column, frame
