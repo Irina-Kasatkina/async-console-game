@@ -45,18 +45,16 @@ def draw(canvas):
         ]
     )
 
-    while True:
+    while coroutines:
         for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
             except StopIteration:
-                canvas.border()
                 coroutines.remove(coroutine)
-            canvas.refresh()
 
-        time.sleep(TIC_TIMEOUT)
-        if not coroutines:
-            break           
+        canvas.border()
+        canvas.refresh()
+        time.sleep(TIC_TIMEOUT)         
 
 
 def create_stars(height, width):
