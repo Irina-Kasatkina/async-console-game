@@ -1,5 +1,4 @@
 import asyncio
-import curses
 from itertools import cycle
 
 from curses_tools import draw_frame, read_controls
