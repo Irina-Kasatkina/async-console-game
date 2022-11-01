@@ -9,6 +9,7 @@ from fire_animation import fire
 from spaceship_animation import animate_spaceship
 
 
+BORDER_WIDTH = 1
 STARS_COUNT = 200
 TIC_TIMEOUT = 0.1
 
@@ -58,8 +59,8 @@ def draw(canvas):
 
 
 def create_stars(height, width):
-    first_row, last_row = 1, height - 2
-    first_column, last_column = 1, width - 2
+    first_row, last_row = BORDER_WIDTH, height - 2 * BORDER_WIDTH
+    first_column, last_column = BORDER_WIDTH, width - 2 * BORDER_WIDTH
     min_delay, max_delay = 0, 20
     symbols = '+*.:'
 
