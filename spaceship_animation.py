@@ -4,44 +4,23 @@ from itertools import cycle
 from curses_tools import draw_frame, read_controls
 
 
-async def animate_spaceship(canvas, spaceship):
-    row, column = spaceship.row, spaceship.column
-    canvas_last_row, canvas_last_column = [size - 1 for size in canvas.getmaxyx()]
+BORDER_WIDTH = 1
 
-    spaceship_rows = spaceship_columns = 0
-    for frame in spaceship.frames:
-        rows, columns = get_frame_size(frame)
-        spaceship_rows = max(spaceship_rows, rows)
-        spaceship_columns = max(spaceship_columns, columns)
 
-    previous_row, previous_column, previous_frame = row, column, ''
-    for frame in cycle(spaceship.frames):
-        draw_frame(canvas, previous_row, previous_column, previous_frame, negative=True)
-        draw_frame(canvas, row, column, frame)
-        previous_row, previous_column, previous_frame = row, column, frame
+async def animate_spaceship(canvas, frames):
+    max_row, max_column = canvas.getmaxyx()
+    max_row, max_column = max_row - BORDER_WIDTH, max_column - BORDER_WIDTH
+    frame_height, frame_width = get_frame_size(frames[0])
+    row, column = (max_row - frame_height) // 2, (max_column - frame_width) // 2
 
+    for frame in cycle(frames):
         for _ in range(2):
-            await asyncio.sleep(0)
             rows_direction, columns_direction, _ = read_controls(canvas)
-
-            if rows_direction:
-                row += rows_direction
-                if row < 1:
-                    row = 1
-                elif row > canvas_last_row - spaceship_rows:
-                    row = canvas_last_row - spaceship_rows
-
-            if columns_direction:
-                column += columns_direction
-                if column < 1:
-                    column = 1
-                elif column > canvas_last_column - spaceship_columns:
-                    column = canvas_last_column - spaceship_columns
-
-            if row != previous_row or column != previous_column:
-                draw_frame(canvas, previous_row, previous_column, previous_frame, negative=True)
-                draw_frame(canvas, row, column, frame)
-                previous_row, previous_column, previous_frame = row, column, frame
+            row = normalize_coordinate(row + rows_direction, max_row - frame_height)
+            column = normalize_coordinate(column + columns_direction, max_column - frame_width)
+            draw_frame(canvas, row, column, frame)
+            await asyncio.sleep(0)
+            draw_frame(canvas, row, column, frame, negative=True)
 
 
 def get_frame_size(text):
@@ -51,3 +30,7 @@ def get_frame_size(text):
     rows = len(lines)
     columns = max([len(line) for line in lines])
     return rows, columns
+
+
+def normalize_coordinate(coordinate, max_coordinate):
+    return min(max_coordinate, max(BORDER_WIDTH, coordinate))

@@ -24,7 +24,7 @@ def draw(canvas):
     height, width = canvas.getmaxyx()
     stars = create_stars(height, width)
     flames = create_flames(height, width)
-    spaceship = get_spaceship(height, width)    
+    spaceship_frames = get_spaceship_frames()    
 
     coroutines = (
         [
@@ -42,7 +42,7 @@ def draw(canvas):
             for flame in flames
         ] +
         [
-            animate_spaceship(canvas, spaceship)
+            animate_spaceship(canvas, spaceship_frames)
         ]
     )
 
@@ -59,16 +59,16 @@ def draw(canvas):
 
 
 def create_stars(height, width):
-    first_row, last_row = BORDER_WIDTH, height - 2 * BORDER_WIDTH
-    first_column, last_column = BORDER_WIDTH, width - 2 * BORDER_WIDTH
+    min_row, max_row = BORDER_WIDTH, height - BORDER_WIDTH
+    min_column, max_column = BORDER_WIDTH, width - BORDER_WIDTH
     min_delay, max_delay = 0, 20
     symbols = '+*.:'
 
     Star = namedtuple('Star', 'row column symbol delay')
     return [
         Star(
-            row=random.randint(first_row, last_row),
-            column=random.randint(first_column, last_column),
+            row=random.randint(min_row, max_row),
+            column=random.randint(min_column, max_column),
             symbol=random.choice(symbols),
             delay=random.randint(min_delay, max_delay)
         )
@@ -97,33 +97,13 @@ def create_flames(height, width):
     ]
 
 
-def get_spaceship(height, width):
-    filenames = ['frames/rocket_frame_1.txt', 'frames/rocket_frame_2.txt']
+def get_spaceship_frames():
     frames = []
-    max_rows_count = max_columns_count = 0
-
-    for filename in filenames:
+    for filename in ['frames/rocket_frame_1.txt', 'frames/rocket_frame_2.txt']:
         with open(filename, 'r') as frame_file:
             frame = frame_file.read()
-
-        rows_count, columns_count = count_rows_and_columns(frame)
-        max_rows_count = max(max_rows_count, rows_count)
-        max_columns_count = max(max_columns_count, columns_count)
         frames.append(frame)
-
-    row = (height - max_rows_count) // 2
-    column = (width - max_columns_count) // 2
-
-    Spaceship = namedtuple('Spaceship', 'row column frames')
-    return Spaceship(row=row, column=column, frames=frames)
-
-
-def count_rows_and_columns(text):
-    columns_count = 0
-    lines = text.split('\n')
-    for line in lines:
-        columns_count = max(columns_count, len(line))
-    return len(lines), columns_count
+    return frames
 
 
 if __name__ == '__main__':
