@@ -1,4 +1,5 @@
 import curses
+import os
 import random
 import time
 from collections import namedtuple
@@ -6,10 +7,13 @@ from itertools import product
 
 from async_animation import blink
 from fire_animation import fire
+from space_garbage import fly_garbage
 from spaceship_animation import animate_spaceship
 
 
 BORDER_WIDTH = 1
+GARBAGE_FRAMES_DIR = 'frames/garbage'
+SPACESHIP_FRAMES_DIR = 'frames/spaceship'
 STARS_COUNT = 200
 TIC_TIMEOUT = 0.1
 
@@ -24,7 +28,8 @@ def draw(canvas):
     height, width = canvas.getmaxyx()
     stars = create_stars(height, width)
     flames = create_flames(height, width)
-    spaceship_frames = get_spaceship_frames()    
+    spaceship_frames = get_frames(SPACESHIP_FRAMES_DIR)
+    garbage_frames = get_frames(GARBAGE_FRAMES_DIR)
 
     coroutines = (
         [
@@ -43,6 +48,9 @@ def draw(canvas):
         ] +
         [
             animate_spaceship(canvas, spaceship_frames)
+        ] +
+        [
+            fly_garbage(canvas, column=10, garbage_frame=random.choice(garbage_frames))
         ]
     )
 
@@ -97,10 +105,10 @@ def create_flames(height, width):
     ]
 
 
-def get_spaceship_frames():
+def get_frames(dirpath):
     frames = []
-    for filename in ['frames/rocket_frame_1.txt', 'frames/rocket_frame_2.txt']:
-        with open(filename, 'r') as frame_file:
+    for filename in os.listdir(dirpath):
+        with open(os.path.join(dirpath, filename), 'r') as frame_file:
             frame = frame_file.read()
         frames.append(frame)
     return frames
