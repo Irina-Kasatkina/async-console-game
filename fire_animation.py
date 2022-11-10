@@ -1,11 +1,13 @@
 import asyncio
 import curses
+from collections import namedtuple
+from itertools import product
 
 
-async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
+async def animate(canvas, allowed_area, flame):
     """Display animation of gun shot, direction and speed can be specified."""
 
-    row, column = start_row, start_column
+    row, column = flame.start_row, flame.start_column
 
     canvas.addstr(round(row), round(column), '*')
     await asyncio.sleep(0)
@@ -14,19 +16,36 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
     await asyncio.sleep(0)
     canvas.addstr(round(row), round(column), ' ')
 
-    row += rows_speed
-    column += columns_speed
+    row += flame.rows_speed
+    column += flame.columns_speed
 
-    symbol = '-' if columns_speed else '|'
-
-    rows, columns = canvas.getmaxyx()
-    max_row, max_column = rows - 1, columns - 1
+    symbol = '-' if flame.columns_speed else '|'
 
     curses.beep()
 
-    while 0 < row < max_row and 0 < column < max_column:
+    while (
+        allowed_area.min_row < row < allowed_area.max_row and
+        allowed_area.min_column < column < allowed_area.max_column
+    ):
         canvas.addstr(round(row), round(column), symbol)
         await asyncio.sleep(0)
         canvas.addstr(round(row), round(column), ' ')
-        row += rows_speed
-        column += columns_speed
+        row += flame.rows_speed
+        column += flame.columns_speed
+
+
+def create_flames(allowed_area):
+    start_row = (allowed_area.max_row - allowed_area.min_row) // 2
+    start_column = (allowed_area.max_column - allowed_area.min_column) // 2
+
+    rows_speed = 0.3
+    columns_speed = rows_speed * allowed_area.max_column / allowed_area.max_row
+    rows_speeds, columns_speeds = [-rows_speed, 0, rows_speed], [-columns_speed, 0, columns_speed]
+    speeds = list(product(rows_speeds, columns_speeds))
+    speeds.remove((0, 0))
+
+    Flame = namedtuple('Flame', 'start_row start_column rows_speed columns_speed')
+    return [
+        Flame(start_row=start_row, start_column=start_column, rows_speed=rows_speed, columns_speed=columns_speed)
+        for rows_speed, columns_speed in speeds
+    ]

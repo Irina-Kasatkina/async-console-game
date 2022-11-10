@@ -1,117 +1,50 @@
 import curses
-import os
-import random
 import time
 from collections import namedtuple
-from itertools import product
 
-from async_animation import blink
-from fire_animation import fire
-from space_garbage import fly_garbage
-from spaceship_animation import animate_spaceship
+import common
+import fire_animation
+import frames
+import garbage_animation
+import stars_animation
+import spaceship_animation
 
 
 BORDER_WIDTH = 1
-GARBAGE_FRAMES_DIR = 'frames/garbage'
-SPACESHIP_FRAMES_DIR = 'frames/spaceship'
-STARS_COUNT = 200
 TIC_TIMEOUT = 0.1
 
 
 def draw(canvas):
-    """Display a gunshot and a spaceship in the sky with blink stars."""
-
     curses.curs_set(False)
     canvas.border()
     canvas.nodelay(True)
 
-    height, width = canvas.getmaxyx()
-    stars = create_stars(height, width)
-    flames = create_flames(height, width)
-    spaceship_frames = get_frames(SPACESHIP_FRAMES_DIR)
-    garbage_frames = get_frames(GARBAGE_FRAMES_DIR)
+    AllowedArea = namedtuple('AllowedArea', 'min_row min_column max_row max_column')
+    max_row, max_column = [last_coordinate - BORDER_WIDTH for last_coordinate in canvas.getmaxyx()]
+    allowed_area = AllowedArea(min_row=BORDER_WIDTH, min_column=BORDER_WIDTH, max_row=max_row, max_column=max_column)
 
-    coroutines = (
-        [
-            blink(canvas, star.row, star.column, delay=star.delay, symbol=star.symbol)
-            for star in stars
-        ] +
-        [
-            fire(
-                canvas,
-                flame.start_row,
-                flame.start_column,
-                rows_speed=flame.rows_speed,
-                columns_speed=flame.columns_speed
-            )
-            for flame in flames
-        ] +
-        [
-            animate_spaceship(canvas, spaceship_frames)
-        ] +
-        [
-            fly_garbage(canvas, column=10, garbage_frame=random.choice(garbage_frames))
-        ]
+    stars = stars_animation.create_stars(allowed_area)
+    flames = fire_animation.create_flames(allowed_area)
+    spaceship = spaceship_animation.create_spaceship(allowed_area)
+    garbage = garbage_animation.create_garbage(allowed_area)
+
+    common.coroutines = (
+        [stars_animation.animate(canvas, star) for star in stars] +
+        [fire_animation.animate(canvas, allowed_area, flame) for flame in flames] +
+        [spaceship_animation.animate(canvas, spaceship)] +
+        [garbage_animation.fill_orbit_with_garbage(canvas, garbage)]
     )
 
-    while coroutines:
-        for coroutine in coroutines.copy():
+    while common.coroutines:
+        for coroutine in common.coroutines.copy():
             try:
                 coroutine.send(None)
             except StopIteration:
-                coroutines.remove(coroutine)
+                common.coroutines.remove(coroutine)
 
         canvas.border()
         canvas.refresh()
-        time.sleep(TIC_TIMEOUT)         
-
-
-def create_stars(height, width):
-    min_row, max_row = BORDER_WIDTH, height - BORDER_WIDTH
-    min_column, max_column = BORDER_WIDTH, width - BORDER_WIDTH
-    min_delay, max_delay = 0, 20
-    symbols = '+*.:'
-
-    Star = namedtuple('Star', 'row column symbol delay')
-    return [
-        Star(
-            row=random.randint(min_row, max_row),
-            column=random.randint(min_column, max_column),
-            symbol=random.choice(symbols),
-            delay=random.randint(min_delay, max_delay)
-        )
-        for _ in range(STARS_COUNT)
-    ]
-
-
-def create_flames(height, width):
-    start_row, start_column = height // 2, width // 2
-
-    rows_speed = 0.3
-    columns_speed = rows_speed * width / height
-    rows_speeds, columns_speeds = [-rows_speed, 0, rows_speed], [-columns_speed, 0, columns_speed]
-    speeds = list(product(rows_speeds, columns_speeds))
-    speeds.remove((0, 0))
-
-    Flame = namedtuple('Flame', 'start_row start_column rows_speed columns_speed')
-    return [
-        Flame(
-            start_row=start_row,
-            start_column=start_column,
-            rows_speed=speed[0],
-            columns_speed=speed[1]
-        )
-        for speed in speeds
-    ]
-
-
-def get_frames(dirpath):
-    frames = []
-    for filename in os.listdir(dirpath):
-        with open(os.path.join(dirpath, filename), 'r') as frame_file:
-            frame = frame_file.read()
-        frames.append(frame)
-    return frames
+        time.sleep(TIC_TIMEOUT)
 
 
 if __name__ == '__main__':
