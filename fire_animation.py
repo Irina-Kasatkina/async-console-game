@@ -16,10 +16,10 @@ async def animate(canvas, allowed_area, flame):
     await asyncio.sleep(0)
     canvas.addstr(round(row), round(column), ' ')
 
-    row += flame.rows_speed
-    column += flame.columns_speed
+    row += flame.row_speed
+    column += flame.column_speed
 
-    symbol = '-' if flame.columns_speed else '|'
+    symbol = '-' if flame.column_speed else '|'
 
     curses.beep()
 
@@ -30,22 +30,26 @@ async def animate(canvas, allowed_area, flame):
         canvas.addstr(round(row), round(column), symbol)
         await asyncio.sleep(0)
         canvas.addstr(round(row), round(column), ' ')
-        row += flame.rows_speed
-        column += flame.columns_speed
+        row += flame.row_speed
+        column += flame.column_speed
 
 
 def create_flames(allowed_area):
     start_row = (allowed_area.max_row - allowed_area.min_row) // 2
     start_column = (allowed_area.max_column - allowed_area.min_column) // 2
 
-    rows_speed = 0.3
-    columns_speed = rows_speed * allowed_area.max_column / allowed_area.max_row
-    rows_speeds, columns_speeds = [-rows_speed, 0, rows_speed], [-columns_speed, 0, columns_speed]
+    row_speed = 0.3
+    column_speed = row_speed * allowed_area.max_column / allowed_area.max_row
+    rows_speeds, columns_speeds = [-row_speed, 0, row_speed], [-column_speed, 0, column_speed]
     speeds = list(product(rows_speeds, columns_speeds))
     speeds.remove((0, 0))
 
-    Flame = namedtuple('Flame', 'start_row start_column rows_speed columns_speed')
     return [
-        Flame(start_row=start_row, start_column=start_column, rows_speed=rows_speed, columns_speed=columns_speed)
-        for rows_speed, columns_speed in speeds
+        create_flame(start_row, start_column, row_speed, column_speed)
+        for row_speed, column_speed in speeds
     ]
+
+
+def create_flame(start_row, start_column, row_speed, column_speed):
+    Flame = namedtuple('Flame', 'start_row start_column row_speed column_speed')
+    return Flame(start_row=start_row, start_column=start_column, row_speed=row_speed, column_speed=column_speed)
