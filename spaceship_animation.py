@@ -4,6 +4,7 @@ from collections import namedtuple
 
 import controls
 import frames_functions
+import physics
 
 
 SPACESHIP_FRAMES_DIR = 'frames/spaceship'
@@ -13,12 +14,14 @@ async def animate(canvas, spaceship):
     frame_size = frames_functions.get_frame_size(spaceship.frames[0])
     row = (spaceship.allowed_area.max_row - frame_size.rows) // 2
     column = (spaceship.allowed_area.max_column - frame_size.columns) // 2
+    row_speed = column_speed = 0
 
     for frame in cycle(spaceship.frames):
         for _ in range(2):
-            rows_speed, columns_speed, _ = controls.read_controls(canvas)
+            rows_direction, columns_direction, _ = controls.read_controls(canvas)
+            row_speed, column_speed = physics.update_speed(row_speed, column_speed, rows_direction, columns_direction)
             row, column = (
-                normalize_coordinates(row + rows_speed, column + columns_speed, spaceship, frame_size)
+                normalize_coordinates(row + row_speed, column + column_speed, spaceship, frame_size)
             )
             frames_functions.draw_frame(canvas, row, column, frame)
             await asyncio.sleep(0)
