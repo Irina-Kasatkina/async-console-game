@@ -2,10 +2,9 @@ import curses
 import time
 from collections import namedtuple
 
-import common
 import fire_animation
-import frames
 import garbage_animation
+import global_variables
 import stars_animation
 import spaceship_animation
 
@@ -28,19 +27,19 @@ def draw(canvas):
     spaceship = spaceship_animation.create_spaceship(allowed_area)
     garbage = garbage_animation.create_garbage(allowed_area)
 
-    common.coroutines = (
+    global_variables.coroutines = (
         [stars_animation.animate(canvas, star) for star in stars] +
         [fire_animation.animate(canvas, allowed_area, flame) for flame in flames] +
         [spaceship_animation.animate(canvas, spaceship)] +
         [garbage_animation.fill_orbit_with_garbage(canvas, garbage)]
     )
 
-    while common.coroutines:
-        for coroutine in common.coroutines.copy():
+    while global_variables.coroutines:
+        for coroutine in global_variables.coroutines.copy():
             try:
                 coroutine.send(None)
             except StopIteration:
-                common.coroutines.remove(coroutine)
+                global_variables.coroutines.remove(coroutine)
 
         canvas.border()
         canvas.refresh()

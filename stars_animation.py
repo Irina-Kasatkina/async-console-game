@@ -3,6 +3,8 @@ import curses
 import random
 from collections import namedtuple
 
+import common_functions
+
 
 STARS_COUNT = 200
 
@@ -18,16 +20,12 @@ async def animate(canvas, star):
     ]
 
     canvas.addstr(star.row, star.column, star.symbol, views[0]['state'])
-    await asyncio.sleep(0)
-
-    for _ in range(star.delay):
-        await asyncio.sleep(0)
+    await common_functions.sleep(star.delay)
 
     while True:
         for view in views:
             canvas.addstr(star.row, star.column, star.symbol, view['state'])
-            for _ in range(view['number']):
-                await asyncio.sleep(0)
+            await common_functions.sleep(view['number'])
 
 
 def create_stars(allowed_area):
