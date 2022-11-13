@@ -1,10 +1,14 @@
+# coding=utf-8
+
+"""Animate fire, flames, shots."""
+
 import asyncio
 import curses
 from collections import namedtuple
 from itertools import product
 
 
-async def animate(canvas, allowed_area, flame):
+async def fire(canvas, allowed_area, flame):
     """Display animation of gun shot, direction and speed can be specified."""
 
     row, column = flame.start_row, flame.start_column

@@ -1,3 +1,7 @@
+# coding=utf-8
+
+"""Calculate physical movement."""
+
 import math
 
 def _limit(value, min_value, max_value):

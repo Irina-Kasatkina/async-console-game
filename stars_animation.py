@@ -1,3 +1,7 @@
+# coding=utf-8
+
+"""Animate stars blinking."""
+
 import asyncio
 import curses
 import random
@@ -9,7 +13,7 @@ import common_functions
 STARS_COUNT = 200
 
 
-async def animate(canvas, star):
+async def blink(canvas, star):
     """Display animation of blink symbols, delay and symbol can be specified."""
 
     views = [

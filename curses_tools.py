@@ -1,5 +1,6 @@
-import os
-from collections import namedtuple
+# coding=utf-8
+
+"""Contain curses tools."""
 
 
 def draw_frame(canvas, start_row, start_column, text, negative=False):
@@ -32,20 +33,3 @@ def draw_frame(canvas, start_row, start_column, text, negative=False):
 
             symbol = symbol if not negative else ' '
             canvas.addch(row, column, symbol)
-
-
-def get_frame_size(text):
-    """Calculate size of multiline text fragment, return pair — number of rows and columns."""
-    
-    lines = text.splitlines()
-    Size = namedtuple('Size', 'rows columns')
-    return Size(rows=len(lines), columns=max([len(line) for line in lines]))
-
-
-def get_frames(dirpath):
-    frames = []
-    for filename in os.listdir(dirpath):
-        with open(os.path.join(dirpath, filename), 'r') as frame_file:
-            frame = frame_file.read()
-        frames.append(frame)
-    return frames
