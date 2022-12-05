@@ -2,6 +2,9 @@
 
 """Contain curses tools."""
 
+import asyncio
+from collections import namedtuple
+
 
 def draw_frame(canvas, start_row, start_column, text, negative=False):
     """Draw multiline text fragment on canvas, erase text instead of drawing if negative=True is specified."""
@@ -33,3 +36,16 @@ def draw_frame(canvas, start_row, start_column, text, negative=False):
 
             symbol = symbol if not negative else ' '
             canvas.addch(row, column, symbol)
+
+
+def get_frame_size(text):
+    """Calculate size of multiline text fragment, return pair — number of rows and columns."""
+    
+    lines = text.splitlines()
+    Size = namedtuple('Size', 'rows columns')
+    return Size(rows=len(lines), columns=max([len(line) for line in lines]))
+
+
+async def sleep(tics=1):
+    for _ in range(tics):
+        await asyncio.sleep(0)

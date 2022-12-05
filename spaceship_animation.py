@@ -5,7 +5,6 @@
 import asyncio
 from itertools import cycle
 
-import common_functions
 import controls
 import curses_tools
 import fire_animation
@@ -17,7 +16,7 @@ SPACESHIP_AND_SHOT_SPEED_DELTA = 0.3
 
 
 async def fly(canvas, allowed_area, spaceship_frames):
-    frame_size = common_functions.get_frame_size(spaceship_frames[0])
+    frame_size = curses_tools.get_frame_size(spaceship_frames[0])
     row = (allowed_area.max_row - frame_size.rows) // 2
     column = (allowed_area.max_column - frame_size.columns) // 2
     row_speed = column_speed = 0

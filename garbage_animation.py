@@ -7,7 +7,6 @@ import random
 import uuid
 from collections import namedtuple
 
-import common_functions
 import curses_tools
 import global_variables
 from obstacles import Obstacle
@@ -18,10 +17,10 @@ async def fill_orbit_with_garbage(canvas, allowed_area, garbage_frames):
         frame = random.choice(garbage_frames)
         column = random.randint(allowed_area.min_column, allowed_area.max_column)
 
-        frame_size = common_functions.get_frame_size(frame)
+        frame_size = curses_tools.get_frame_size(frame)
         uid = uuid.uuid4()
         global_variables.coroutines += [fly_garbage(canvas, allowed_area.max_row, column, frame, frame_size, uid)]
-        await common_functions.sleep(random.randint(8, 18))
+        await curses_tools.sleep(random.randint(8, 18))
 
 
 async def fly_garbage(canvas, max_row, column, frame, frame_size, uid):

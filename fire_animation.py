@@ -7,6 +7,7 @@ import curses
 from collections import namedtuple
 from itertools import product
 
+import explosion
 import global_variables
 
 
@@ -41,6 +42,7 @@ async def fire(canvas, allowed_area, flame):
         for obstacle in global_variables.obstacles:
             if obstacle.has_collision(row, column):
                 global_variables.obstacles_in_last_collisions.append(obstacle.uid)
+                await explosion.explode(canvas, row, column)
                 return
 
 
