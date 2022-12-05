@@ -40,4 +40,7 @@ async def fly_garbage(canvas, max_row, column, frame, frame_size, uid):
                 break
 
         curses_tools.draw_frame(canvas, row, column, frame, negative=True)
+        if uid in global_variables.obstacles_in_last_collisions:
+            global_variables.obstacles_in_last_collisions.remove(uid)
+            return
         row += speed

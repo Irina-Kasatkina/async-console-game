@@ -40,6 +40,7 @@ async def fire(canvas, allowed_area, flame):
         column += flame.column_speed
         for obstacle in global_variables.obstacles:
             if obstacle.has_collision(row, column):
+                global_variables.obstacles_in_last_collisions.append(obstacle.uid)
                 return
 
 

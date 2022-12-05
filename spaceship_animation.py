@@ -34,7 +34,7 @@ async def fly(canvas, allowed_area, spaceship_frames):
                 nose_column = column + from_left_to_nose
                 flame_row_speed = row_speed - SPACESHIP_AND_SHOT_SPEED_DELTA
                 flame = fire_animation.create_flame(row, nose_column, flame_row_speed, column_speed=0)
-                global_variables.coroutines += [fire_animation.animate(canvas, allowed_area, flame)]
+                global_variables.coroutines += [fire_animation.fire(canvas, allowed_area, flame)]
 
             curses_tools.draw_frame(canvas, row, column, frame)
             await asyncio.sleep(0)
