@@ -7,6 +7,8 @@ import curses
 from collections import namedtuple
 from itertools import product
 
+import global_variables
+
 
 async def fire(canvas, allowed_area, flame):
     """Display animation of gun shot, direction and speed can be specified."""
@@ -36,6 +38,9 @@ async def fire(canvas, allowed_area, flame):
         canvas.addstr(round(row), round(column), ' ')
         row += flame.row_speed
         column += flame.column_speed
+        for obstacle in global_variables.obstacles:
+            if obstacle.has_collision(row, column):
+                return
 
 
 def create_flames(allowed_area):

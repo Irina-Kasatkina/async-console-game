@@ -24,6 +24,7 @@ TIC_TIMEOUT = 0.1
 
 def draw(canvas):
     """Draw game field."""
+
     curses.curs_set(False)
     canvas.border()
     canvas.nodelay(True)
@@ -59,6 +60,7 @@ def draw(canvas):
 
 def get_frames(dirpath):
     """Read frames from files in specified directory."""
+
     frames = []
     for filename in os.listdir(dirpath):
         with open(os.path.join(dirpath, filename), 'r') as frame_file:
