@@ -30,7 +30,7 @@ async def run_spaceship(canvas, allowed_area, spaceship_frames):
             row, column = (
                 normalize_coordinates(row + row_speed, column + column_speed, allowed_area, frame_size)
             )
-            if space_pressed:
+            if space_pressed and global_variables.year > 2020:
                 nose_column = column + from_left_to_nose
                 flame_row_speed = row_speed - SPACESHIP_AND_SHOT_SPEED_DELTA
                 flame = fire_animation.create_flame(row, nose_column, flame_row_speed, column_speed=0)
