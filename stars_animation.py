@@ -24,6 +24,7 @@ async def blink(canvas, star):
     ]
 
     canvas.addstr(star.row, star.column, star.symbol, views[0]['state'])
+    await curses_tools.sleep(star.delay)
 
     while True:
         for view in views:

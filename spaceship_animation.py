@@ -9,13 +9,14 @@ import controls
 import curses_tools
 import fire_animation
 import global_variables
+import obstacles
 import physics
 
 
 SPACESHIP_AND_SHOT_SPEED_DELTA = 0.3
 
 
-async def fly(canvas, allowed_area, spaceship_frames):
+async def run_spaceship(canvas, allowed_area, spaceship_frames):
     frame_size = curses_tools.get_frame_size(spaceship_frames[0])
     row = (allowed_area.max_row - frame_size.rows) // 2
     column = (allowed_area.max_column - frame_size.columns) // 2
@@ -38,6 +39,11 @@ async def fly(canvas, allowed_area, spaceship_frames):
             curses_tools.draw_frame(canvas, row, column, frame)
             await asyncio.sleep(0)
             curses_tools.draw_frame(canvas, row, column, frame, negative=True)
+
+            for obstacle in global_variables.obstacles:
+                if obstacle.has_collision(row, column,  frame_size.rows, frame_size.columns):
+                    global_variables.coroutines = []
+                    return
 
 
 def normalize_coordinates(row, column, allowed_area, frame_size):
